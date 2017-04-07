@@ -1,0 +1,25 @@
+{
+  "versionLabel": "1.0.0",
+  "agentInfo": {
+    "languageCode": "en-US",
+    "projectId": "<PROJECT_ID>",
+    "voiceName": "male_1",
+    "accountLinking": {
+      "grantType": "AUTH_CODE_GRANT",
+      "clientId": "<CLIENT_ID>",
+      "clientSecret": "<CLIENT_SECRET>",
+      "authenticationUrl": "https://auth.getmondo.co.uk/",
+      "accessTokenUrl": "https://api.monzo.com/oauth2/token"
+    }
+  },
+  "actions": [
+    {
+      "initialTrigger": {
+        "intent": "assistant.intent.action.MAIN"
+      },
+      "httpExecution": {
+        "url": "<CLOUD_FUNCTION_URL>"
+      }
+    }
+  ]
+}
