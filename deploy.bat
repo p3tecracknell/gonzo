@@ -1,1 +1,0 @@
-gcloud beta functions deploy <FUNC_NAME> --stage-bucket <BUCKET_NAME> --trigger-http --entry-point process

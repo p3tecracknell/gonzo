@@ -6,6 +6,10 @@
   "repository": "https://github.com/tommy5dollar/okmonzo.git",
   "author": "Thomas Long <tommy5dollar@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "deploy": "gcloud beta functions deploy <FUNC_NAME> --stage-bucket <BUCKET_NAME> --trigger-http --entry-point process",
+    "simulator": "<GACTIONS_SDK_PATH>gactions preview -action_package=action.json -invocation_name=<VOICE_COMMAND>"
+  },
   "dependencies": {
     "actions-on-google": "^1.0.8",
     "moment": "^2.18.1",
