@@ -36,7 +36,7 @@ expressApp.post('*', function(request, response) {
   }
 
   function transactions() {
-    const token = app.getUser() ? app.getUser().accessToken : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaSI6Im9hdXRoY2xpZW50XzAwMDA5TmJaR0owU2ZsQzBCazh0ZXIiLCJleHAiOjE1MDM0NDY2NTYsImlhdCI6MTUwMzQyNTA1NiwianRpIjoidG9rXzAwMDA5TmtMN3VzMHNQYUNhaUVtY3oiLCJ1aSI6InVzZXJfMDAwMDk5bnVvWTJyMzBpcmZaYzE3aCIsInYiOiIyIn0.xcFu6PRcXor_EUL7czDDbYE6VzBNClb_bALFn3zbhpY"
+    const token = app.getUser().accessToken
     monzo.transactions(token)
       .then(transactions => {
         const lastThree = transactions.slice(-3)
