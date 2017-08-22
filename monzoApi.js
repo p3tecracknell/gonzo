@@ -39,6 +39,16 @@ const getBalance = (accountId, token) => {
 	return request(requestOptions);
 };
 
+const getTransactions = (accountId, token) => {
+  const additionalRequestOptions = {
+    qs: { account_id: accountId }
+  };
+
+  const requestOptions = _.extend(requestOptionsForRoute('/transactions', token), additionalRequestOptions);
+  return request(requestOptions);
+};
+
 module.exports.getProfile = getProfile;
 module.exports.getAccounts = getAccounts;
 module.exports.getBalance = getBalance;
+module.exports.getTransactions = getTransactions;

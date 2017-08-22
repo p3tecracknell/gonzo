@@ -66,6 +66,23 @@ const userNumber = token => {
 		.then(profile => profile.user_number);
 };
 
+const transactions = token => {
+  return monzoApi.getAccounts(token)
+    .then(accounts => {
+      const account = accounts[0];
+
+      return monzoApi.getTransactions(account.id, token);
+    })
+    .then(response => {
+      const transactions = response.transactions
+//      transactions.forEach(txn => {
+//        txn.amount = utils.currencyToWords(txn.amount, txn.currency)
+//        txn.account_balance = utils.currencyToWords(txn.account_balance, txn.currency)
+//      })
+      return transactions
+    })
+};
+
 module.exports.balance = balance;
 module.exports.spentToday = spentToday;
 module.exports.name = name;
@@ -74,3 +91,4 @@ module.exports.email = email;
 module.exports.telephone = telephone;
 module.exports.dateOfBirth = dateOfBirth;
 module.exports.userNumber = userNumber;
+module.exports.transactions = transactions;

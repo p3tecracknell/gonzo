@@ -5,9 +5,10 @@ process.env.DEBUG = `actions-on-google:*`;
 const express = require('express')
 const bodyParser = require('body-parser')
 const ApiAiApp = require(`actions-on-google`).ApiAiApp
-const monzo = require(`./monzo`);
+const monzo = require(`./monzo`)
+const utils = require('./utils')
 
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 3000
 
 const expressApp = express()
 expressApp.use(bodyParser.json());
@@ -22,15 +23,6 @@ expressApp.post('*', function(request, response) {
       .then(balance => app.ask(`Hello. Your balance is ${balance}. Just say help to find out what else I can do`))
   }
 
-  function signIn (app) {
-    if (app.getSignInStatus() === app.SignInstatus.OK) {
-      let accessToken = app.getUser().accessToken;
-      app.ask('Great, thanks for signing in!');
-    } else {
-      app.ask('I cannot get Monzo details without signing in');
-    }
-  }
-
   function getBalance() {
     const token = app.getUser().accessToken
     return monzo.balance(token)
@@ -43,9 +35,38 @@ expressApp.post('*', function(request, response) {
       .then(spentToday => app.tell(`You've spent ${spentToday} today`));
   }
 
+  function transactions() {
+    const token = app.getUser() ? app.getUser().accessToken : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaSI6Im9hdXRoY2xpZW50XzAwMDA5TmJaR0owU2ZsQzBCazh0ZXIiLCJleHAiOjE1MDM0NDY2NTYsImlhdCI6MTUwMzQyNTA1NiwianRpIjoidG9rXzAwMDA5TmtMN3VzMHNQYUNhaUVtY3oiLCJ1aSI6InVzZXJfMDAwMDk5bnVvWTJyMzBpcmZaYzE3aCIsInYiOiIyIn0.xcFu6PRcXor_EUL7czDDbYE6VzBNClb_bALFn3zbhpY"
+    monzo.transactions(token)
+      .then(transactions => {
+        const lastThree = transactions.slice(-3)
+        const speech = []
+
+        const list = app.buildList('Transactions')
+        lastThree.forEach((transaction, index) => {
+          const amount = (-transaction.amount / 100).toFixed(2)
+          const balance = (transaction.account_balance / 100).toFixed(2)
+
+          let description = transaction.description.split(' ')[0]
+          description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
+          speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
+          list.addItems(app.buildOptionItem(index.toString())
+            .setTitle(description + ' (£' + amount + ')')
+            .setDescription(Balance: £' + balance)
+          )
+        })
+
+        const speechText = speech.join(', ')
+        app.askWithList(app.buildRichResponse()
+          .addSimpleResponse(speechText), list)
+      })
+
+//    return app.tell('Transaction list..')
+  }
+
 	let actionMap = new Map();
   actionMap.set('input.welcome', welcomeIntent)
-  actionMap.set('sign.in', signIn)
+  actionMap.set('transactions', transactions)
   actionMap.set('get_balance', getBalance)
   actionMap.set('daily_spend', dailySpend)
   app.handleRequest(actionMap)
