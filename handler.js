@@ -47,12 +47,12 @@ expressApp.post('*', function(request, response) {
         recentTxn.forEach((transaction, index) => {
           const amount = (-transaction.amount / 100).toFixed(2)
           const balance = (transaction.account_balance / 100).toFixed(2)
-          const dateTime = (new Date(transaction.created)).toString().substring(0, 22)
+          const dateTime = (new Date(transaction.created)).toString().substring(0, 21)
 
           let description = transaction.description.split(' ')[0]
           description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
           speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
-          list.addItems(app.buildOptionItem(index.toString())
+          list.addItems(app.buildOptionItem('txn'+index.toString())
             .setTitle(description + ' (' + dateTime + ')')
             .setDescription('Amount: £' + amount + ', Balance: £' + balance)
           )
