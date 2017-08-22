@@ -53,7 +53,7 @@ expressApp.post('*', function(request, response) {
           description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
           speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
           list.addItems(app.buildOptionItem('txn'+index.toString())
-            .setTitle(description + ' (' + dateTime + ')')
+            .setTitle((index+1).toString() + '. ' + description + ' (' + dateTime + ')')
             .setDescription('Amount: £' + amount + ', Balance: £' + balance)
           )
         })
