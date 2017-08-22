@@ -37,22 +37,24 @@ expressApp.post('*', function(request, response) {
 
   function transactions() {
     const token = app.getUser().accessToken
+    const numTransactions = app.getArgument('number') || 3
     monzo.transactions(token)
       .then(transactions => {
-        const lastThree = transactions.slice(-3)
+        const recentTxn = transactions.slice(-numTransactions)
         const speech = []
 
         const list = app.buildList('Transactions')
-        lastThree.forEach((transaction, index) => {
+        recentTxn.forEach((transaction, index) => {
           const amount = (-transaction.amount / 100).toFixed(2)
           const balance = (transaction.account_balance / 100).toFixed(2)
+          const dateTime = (new Date(transaction.created)).toString().substring(0, 22)
 
           let description = transaction.description.split(' ')[0]
           description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
           speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
           list.addItems(app.buildOptionItem(index.toString())
-            .setTitle(description + ' (£' + amount + ')')
-            .setDescription(Balance: £' + balance)
+            .setTitle(description + ' (' + dateTime + ')')
+            .setDescription('Amount: £' + amount + ', Balance: £' + balance)
           )
         })
 
