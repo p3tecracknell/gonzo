@@ -11,6 +11,7 @@ function addIntent(intent, fn) {
   alexaApp.intent(intent, async function(request, response) {
     const token = request.sessionDetails.accessToken
     if (!token) return response.say('You must be logged in to use Monzo')
+    console.log(request)
     await fn(request, response, token)
   })
 }
@@ -56,7 +57,11 @@ async function transactions(request, response, token) {
   //  )
   })
 
-  const speechText = speech.join(', ')
-  response.say(speechText)
+  response.say(speech.join(', '))
+  response.card({
+    type: 'Simple',
+    title: 'Transactions',
+    content: speech.join('\n')
+  })
   //app.askWithList(app.buildRichResponse().addSimpleResponse(speechText), list)
 }
