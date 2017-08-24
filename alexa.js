@@ -4,7 +4,7 @@ const alexa = require('alexa-app');
 const monzo = require(`./monzo`)
 const utils = require('./utils')
 
-const alexaApp = new alexa.app('helloWorld');
+const alexaApp = new alexa.app('monzo');
 module.exports = alexaApp
 
 function addIntent(intent, fn) {
@@ -36,12 +36,12 @@ async function dailySpend(request, response, token) {
 }
 
 async function transactions(request, response, token) {
-  const numTransactions = app.getArgument('number') || 3
+  const numTransactions = request.slot('numberslot') || 3
   const transactions = await monzo.transactions(token)
   const recentTxn = transactions.slice(-numTransactions)
   const speech = []
 
-  const list = app.buildList('Transactions')
+//  const list = app.buildList('Transactions')
   recentTxn.forEach((transaction, index) => {
     const amount = (-transaction.amount / 100).toFixed(2)
     const balance = (transaction.account_balance / 100).toFixed(2)
@@ -50,12 +50,13 @@ async function transactions(request, response, token) {
     let description = transaction.description.split(' ')[0]
     description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
     speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
-    list.addItems(app.buildOptionItem('txn'+index.toString())
-      .setTitle((index+1).toString() + '. ' + description + ' (' + dateTime + ')')
-      .setDescription('Amount: £' + amount + ', Balance: £' + balance)
-    )
+  //  list.addItems(app.buildOptionItem('txn'+index.toString())
+  //    .setTitle((index+1).toString() + '. ' + description + ' (' + dateTime + ')')
+  //    .setDescription('Amount: £' + amount + ', Balance: £' + balance)
+  //  )
   })
 
   const speechText = speech.join(', ')
-  app.askWithList(app.buildRichResponse().addSimpleResponse(speechText), list)
+  response.say(speechText)
+  //app.askWithList(app.buildRichResponse().addSimpleResponse(speechText), list)
 }
