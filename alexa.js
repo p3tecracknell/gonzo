@@ -10,8 +10,7 @@ module.exports = alexaApp
 function addIntent(intent, fn) {
   alexaApp.intent(intent, async function(request, response) {
     const token = request.sessionDetails.accessToken
-    if (!token) return response.say('You must be logged in to use Monzo')
-    console.log(request)
+    if (!token) return response.linkAccount()
     await fn(request, response, token)
   })
 }
