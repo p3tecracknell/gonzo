@@ -13,16 +13,25 @@ let actionMap = new Map();
 
 function addIntent(intent, fn) {
   actionMap.set(intent, async function(app) {
-    const token = app.getUser().accessToken;
-    if (!token) return app.tell('You must be logged in to use Monzo')
+    const token = (app.getUser()) ? app.getUser().accessToken : ''
+    //if (!token) return app.tell('You must be logged in to use Monzo')
     await fn(app, token)
   })
 }
 
+actionMap.set('add', function(app) {
+  const n1 = parseInt(app.getArgument('number1'))
+  const n2 = parseInt(app.getArgument('number2'))
+
+  return app.tell((n1+n2).toString())
+})
 addIntent('input.welcome', welcomeIntent)
 addIntent('transactions', transactions)
 addIntent('get_balance', getBalance)
 addIntent('daily_spend', dailySpend)
+addIntent('Pay', pay)
+addIntent('pay', pay)
+addIntent('Pay.Pay-yes', payConfirm)
 
 async function welcomeIntent (app, token) {
   const balance = await monzo.balance(token)
@@ -64,7 +73,25 @@ async function transactions(app, token) {
   app.askWithList(app.buildRichResponse().addSimpleResponse(speechText), list)
 }
 
+async function pay(app, token) {
+  const amount = app.getArgument('unit-currency')
+  const givenName = app.getArgument('given-name')
+  const amountWords = utils.currencyToWords(amount.amount * 100, amount.currency)
+
+console.log(app.state)
+  app.ask(`Are you sure you want to send ${amountWords} to ${givenName}?`)
+}
+
+async function payConfirm(app, token) {
+  const amount = app.getContextArgument('pay-followup', 'unit-currency').value
+  const givenName = app.getContextArgument('pay-followup', 'given-name').value
+  const amountWords = utils.currencyToWords(amount.amount * 100, amount.currency)
+
+  app.tell(`${amountWords} sent to ${givenName}`)
+}
+
 module.exports = function(request, response) {
+  console.log(request)
 	const app = new ApiAiApp({request, response})
   app.handleRequest(actionMap)
 }

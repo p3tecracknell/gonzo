@@ -12,6 +12,7 @@
   "dependencies": {
     "actions-on-google": "^1.2.0",
     "alexa-app": "^4.1.0",
+    "fuzzy-search": "^1.4.0",
     "moment": "^2.18.1",
     "momentjs": "^2.0.0",
     "request": "^2.81.0",

@@ -9,9 +9,11 @@ module.exports = alexaApp
 
 function addIntent(intent, fn) {
   alexaApp.intent(intent, async function(request, response) {
+    console.log(request)
     const token = request.sessionDetails.accessToken
     if (!token) return response.linkAccount()
     await fn(request, response, token)
+    console.log(response)
   })
 }
 
@@ -19,6 +21,7 @@ addIntent('Welcome', welcomeIntent)
 addIntent('RecentTransactions', transactions)
 addIntent('GetBalance', getBalance)
 addIntent('DailySpend', dailySpend)
+addIntent('TransactionSearch', transactionSearch)
 
 async function welcomeIntent (request, response, token) {
   const balance = await monzo.balance(token)
@@ -63,4 +66,9 @@ async function transactions(request, response, token) {
     content: speech.join('\n')
   })
   //app.askWithList(app.buildRichResponse().addSimpleResponse(speechText), list)
+}
+
+async function transactionSearch(request, response, token) {
+  const results = await monzo.transactionSearch(token)
+  response.say('todo')
 }

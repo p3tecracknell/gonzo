@@ -3,6 +3,7 @@
 const monzoApi = require(`./monzoApi`);
 
 const utils = require(`./utils`);
+const FuzzySearch = require('fuzzy-search');
 
 const balance = token => {
 	return monzoApi.getAccounts(token)
@@ -73,14 +74,20 @@ const transactions = token => {
 
       return monzoApi.getTransactions(account.id, token);
     })
-    .then(response => {
-      const transactions = response.transactions
+    .then(response => response.transactions)
+//      const transactions = response.transactions
 //      transactions.forEach(txn => {
 //        txn.amount = utils.currencyToWords(txn.amount, txn.currency)
 //        txn.account_balance = utils.currencyToWords(txn.account_balance, txn.currency)
 //      })
-      return transactions
-    })
+//      return transactions
+//    })
+};
+
+async function transactionSearch(token, needle) {
+  const transactions = await transactions(token)
+  const searcher = new FuzzySearch(transactions, ['description']);
+  return searcher.search(needle);
 };
 
 module.exports.balance = balance;
@@ -92,3 +99,4 @@ module.exports.telephone = telephone;
 module.exports.dateOfBirth = dateOfBirth;
 module.exports.userNumber = userNumber;
 module.exports.transactions = transactions;
+module.exports.transactionSearch = transactionSearch;
