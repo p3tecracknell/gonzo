@@ -13,20 +13,15 @@ let actionMap = new Map();
 
 function addIntent(intent, fn) {
   actionMap.set(intent, async function(app) {
-    const token = (app.getUser()) ? app.getUser().accessToken : ''
-    //if (!token) return app.tell('You must be logged in to use Monzo')
+    const token = app.getUser().accessToken
+    if (!token) return app.tell('You must be logged in to use Monzo')
     await fn(app, token)
   })
 }
 
-actionMap.set('add', function(app) {
-  const n1 = parseInt(app.getArgument('number1'))
-  const n2 = parseInt(app.getArgument('number2'))
-
-  return app.tell((n1+n2).toString())
-})
 addIntent('input.welcome', welcomeIntent)
 addIntent('transactions', transactions)
+addIntent('recenttransactions.recenttransactions-selectnumber', transactionSelect)
 addIntent('get_balance', getBalance)
 addIntent('daily_spend', dailySpend)
 addIntent('Pay', pay)
@@ -52,25 +47,41 @@ async function transactions(app, token) {
   const numTransactions = app.getArgument('number') || 3
   const transactions = await monzo.transactions(token)
   const recentTxn = transactions.slice(-numTransactions)
-  const speech = []
 
-  const list = app.buildList('Transactions')
-  recentTxn.forEach((transaction, index) => {
-    const amount = (-transaction.amount / 100).toFixed(2)
-    const balance = (transaction.account_balance / 100).toFixed(2)
-    const dateTime = (new Date(transaction.created)).toString().substring(0, 21)
+  if (app.hasSurfaceCapability(app.SurfaceCapabilities.SCREEN_OUTPUT)) {
 
-    let description = transaction.description.split(' ')[0]
-    description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
-    speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
-    list.addItems(app.buildOptionItem('txn'+index.toString())
-      .setTitle((index+1).toString() + '. ' + description + ' (' + dateTime + ')')
-      .setDescription('Amount: £' + amount + ', Balance: £' + balance)
-    )
-  })
+    const list = app.buildList('Transactions')
+    recentTxn.forEach((transaction, index) => {
+      const amount = (-transaction.amount / 100).toFixed(2)
+      const balance = (transaction.account_balance / 100).toFixed(2)
+      const dateTime = (new Date(transaction.created)).toString().substring(0, 21)
 
-  const speechText = speech.join(', ')
-  app.askWithList(app.buildRichResponse().addSimpleResponse(speechText), list)
+      let description = transaction.description.split(' ')[0]
+      description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
+      list.addItems(app.buildOptionItem(transaction.id, [(index+1).toString(), description])
+        .setTitle((index+1).toString() + '. ' + description + ' (' + dateTime + ')')
+        .setDescription('Amount: £' + amount + ', Balance: £' + balance)
+      )
+    })
+    app.askWithList('Ask more about a transaction', list)
+
+  } else {
+    const speech = []
+    recentTxn.forEach((transaction, index) => {
+      let description = transaction.description.split(' ')[0]
+      description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase()
+      speech.push(description + ', ' + utils.currencyToWords(-transaction.amount, transaction.currency))
+    })
+
+    const speechText = speech.join(', ')
+    app.tell(speechText)
+  }
+}
+
+async function transactionSelect(app, token) {
+  const id = app.getSelectedOption()
+//  const transactions = await monzo.transactionById(id, token)
+  app.tell('todo: ' + id)
 }
 
 async function pay(app, token) {
@@ -78,7 +89,6 @@ async function pay(app, token) {
   const givenName = app.getArgument('given-name')
   const amountWords = utils.currencyToWords(amount.amount * 100, amount.currency)
 
-console.log(app.state)
   app.ask(`Are you sure you want to send ${amountWords} to ${givenName}?`)
 }
 
