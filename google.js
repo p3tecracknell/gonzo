@@ -13,7 +13,7 @@ let actionMap = new Map();
 
 function addIntent(intent, fn) {
   actionMap.set(intent, async function(app) {
-    const token = app.getUser().accessToken
+    const token = (app.getUser()) ? app.getUser().accessToken : null
     if (!token) return app.tell('You must be logged in to use Monzo')
     await fn(app, token)
   })
