@@ -2,8 +2,6 @@
 
 process.env.DEBUG = `actions-on-google:*`;
 
-const express = require('express')
-const ApiAiApp = require(`actions-on-google`).ApiAiApp
 const monzo = require(`./monzo`)
 const utils = require('./utils')
 
