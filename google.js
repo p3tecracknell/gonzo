@@ -25,8 +25,12 @@ addIntent('pay', pay)
 addIntent('Pay.Pay-yes', payConfirm)
 
 async function welcomeIntent (app, token) {
-  const balance = await monzo.balance(token)
-  return app.ask(`Hello. Your balance is ${balance}. Just say help to find out what else I can do`)
+  try {
+    const balance = await monzo.balance(token)
+    app.ask(`Hello. Your balance is ${balance}. Just say help to find out what else I can do`)
+  } catch(error) {
+    app.tell('Sorry, please try again later')
+  }
 }
 
 async function getBalance(app, token) {
