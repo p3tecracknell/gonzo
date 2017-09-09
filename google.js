@@ -3,8 +3,6 @@
 process.env.DEBUG = `actions-on-google:*`;
 
 const express = require('express')
-const alexa = require('alexa-app');
-const bodyParser = require('body-parser')
 const ApiAiApp = require(`actions-on-google`).ApiAiApp
 const monzo = require(`./monzo`)
 const utils = require('./utils')
@@ -100,8 +98,4 @@ async function payConfirm(app, token) {
   app.tell(`${amountWords} sent to ${givenName}`)
 }
 
-module.exports = function(request, response) {
-  console.log(request)
-	const app = new ApiAiApp({request, response})
-  app.handleRequest(actionMap)
-}
+module.exports = actionMap

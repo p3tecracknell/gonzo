@@ -1,23 +1,28 @@
 {
-  "name": "okmonzo",
-  "description": "Google Home integration for Monzo Bank API",
+  "name": "gonzo",
+  "description": "Google Home and Alexa integration for Monzo Bank API",
   "version": "1.0.0",
-  "main": "handler.js",
-  "repository": "https://github.com/tommy5dollar/okmonzo.git",
+  "main": "server.js",
+  "repository": "https://github.com/p3tecracknell/gonzo.git",
   "author": "Thomas Long <tommy5dollar@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node handler.js"
+    "start": "node server.js",
+    "test": "mocha --reporter spec ./test/*.js"
   },
   "dependencies": {
     "actions-on-google": "^1.2.0",
     "alexa-app": "^4.1.0",
+    "body-parser": "^1.18.0",
     "express": "^4.15.4",
     "fuzzy-search": "^1.4.0",
     "moment": "^2.18.1",
-    "momentjs": "^2.0.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^3.5.0"
   }
 }
